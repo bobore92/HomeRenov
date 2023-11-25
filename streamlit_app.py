@@ -44,13 +44,13 @@ class RenovationAssistant:
 # Streamlit app initialization
 st.title("AI - House Renovation")
 
-# Instantiate the assistant class using the OpenAI API key from Streamlit secrets
-assistant = RenovationAssistant("YOUR_OPENAI_API_KEY")
-
 # Set sidebar style
 st.sidebar.markdown("<h1 style='color: #0b53a1;'>User Input</h1>", unsafe_allow_html=True)
 user_input = st.sidebar.text_input("How may I assist with your home renovation?")
 form_submit = st.sidebar.form_submit_button("Submit")
+
+# Instantiate the assistant class using the OpenAI API key from Streamlit secrets
+assistant = RenovationAssistant("YOUR_OPENAI_API_KEY")
 
 # Callback function to handle form submission
 def handle_form_submission():
