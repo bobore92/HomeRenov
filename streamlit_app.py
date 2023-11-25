@@ -6,11 +6,15 @@ import streamlit as st
 
 import streamlit as st
 
+import streamlit as st
+
 image_url = 'https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg'
 
 # Centered container for the image
 st.markdown(
-    f'<div style="display: flex; justify-content: center;"><img src="{image_url}" width="300"/></div>',
+    f'<div style="display: flex; justify-content: center; align-items: center; height: 300px;">'
+    f'<img src="{image_url}" style="width:300px; height:auto;"/>'
+    '</div>',
     unsafe_allow_html=True
 )
 
