@@ -60,10 +60,9 @@ st.title("AI - House Renovation")
 for message in st.session_state.conversation_history:
     st.write(f"{message['role'].title()}: {message['content']}")
 
-# User input form to manage the state properly
-with st.sidebar(key='user_input_form'):
-    user_input = st.text_input("")
-    form_submit = st.form_submit_button("Submit")
+# User input form
+user_input = st.text_input("How may I assist with your home renovation?", key='user_input')
+form_submit = st.form_submit_button("Submit")
 
 # Callback function to handle form submission
 def handle_form_submission():
