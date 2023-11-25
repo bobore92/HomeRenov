@@ -61,33 +61,34 @@ for message in st.session_state.conversation_history:
     st.write(f"{message['role'].title()}: {message['content']}")
 
 # User input form
-user_input = st.text_input("How may I assist with your home renovation?", key='user_input')
-form_submit = st.form_submit_button("Submit")
+with st.form(key='user_input_form'):
+    user_input = st.text_input("How may I assist with your home renovation?", key='user_input')
+    form_submit = st.form_submit_button("Submit")
 
-# Callback function to handle form submission
-def handle_form_submission():
-    user_question = user_input  # Retrieve the input from the form
-    if user_question:
-        # Append the user's question
-        st.session_state.conversation_history.append({'role': 'user', 'content': user_question})
+    # Callback function to handle form submission
+    def handle_form_submission():
+        user_question = user_input  # Retrieve the input from the form
+        if user_question:
+            # Append the user's question
+            st.session_state.conversation_history.append({'role': 'user', 'content': user_question})
 
-        # Process the user's question against the assistant's supplier categories
-        category_found = False
-        for category, advice in assistant.supplier_categories.items():
-            if category in user_question.lower():
-                st.session_state.conversation_history.append({'role': 'assistant', 'content': advice})
-                category_found = True
-                break
+            # Process the user's question against the assistant's supplier categories
+            category_found = False
+            for category, advice in assistant.supplier_categories.items():
+                if category in user_question.lower():
+                    st.session_state.conversation_history.append({'role': 'assistant', 'content': advice})
+                    category_found = True
+                    break
 
-        # If the user's question does not match any category, ask the assistant (GPT-4 model)
-        if not category_found:
-            answer = assistant.ask_openai(user_question, st.session_state.conversation_history)
-            st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
+            # If the user's question does not match any category, ask the assistant (GPT-4 model)
+            if not category_found:
+                answer = assistant.ask_openai(user_question, st.session_state.conversation_history)
+                st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
 
-        # The form has been submitted, now display the assistant's response
-        for message in st.session_state.conversation_history[-2:]:  # Displaying the last 2 messages from the conversation history
-            st.write(f"{message['role'].title()}: {message['content']}")
+            # The form has been submitted, now display the assistant's response
+            for message in st.session_state.conversation_history[-2:]:  # Displaying the last 2 messages from the conversation history
+                st.write(f"{message['role'].title()}: {message['content']}")
 
-# Check if the user input form has been submitted
-if form_submit:
-    handle_form_submission()
+    # Check if the user input form has been submitted
+    if form_submit:
+        handle_form_submission()
