@@ -3,7 +3,6 @@ import requests
 import streamlit as st
 
 class RenovationAssistant:
-
     def __init__(self, openai_api_key):
         self.openai_api_key = openai_api_key
         self.supplier_categories = {
@@ -14,12 +13,12 @@ class RenovationAssistant:
         }
 
     def ask_openai(self, question, conversation_history):
-        # ... (rest of the ask_openai code)
+        # Rest of the ask_openai code
 
     def get_category_advice(self, category):
-        # ... (rest of the get_category_advice code)
+        # Rest of the get_category_advice code
 
-# Initialize conversation history in st.session_state if not present
+# Ensure `conversation_history` is initialized in session state
 if 'conversation_history' not in st.session_state:
     st.session_state['conversation_history'] = [{
         'role': 'system',
@@ -29,14 +28,14 @@ if 'conversation_history' not in st.session_state:
         )
     }]
 
-# Streamlit app interface setup
+# Streamlit app interface
 st.title("Home Renovation Assistant")
 
-# Instantiate the assistant class
+# Instantiate the RenovationAssistant class
 openai_api_key = st.secrets["OPENAI_KEY"]
 assistant = RenovationAssistant(openai_api_key)
 
-# Display conversation history
+# Display the conversation history
 for message in st.session_state['conversation_history']:
     role = message['role'].title()
     st.write(f"{role}: {message['content']}")
@@ -49,17 +48,21 @@ if submit_button and user_question:
     st.session_state['conversation_history'].append({'role': 'user', 'content': user_question})
 
     category_found = False
-    for category in assistant.supplier_categories:
+    for category, advice in assistant.supplier_categories.items():
         if category in user_question.lower():
-            category_advice = assistant.get_category_advice(category)
-            st.session_state['conversation_history'].append({'role': 'assistant', 'content': category_advice})
-            st.write(f"Assistant: {category_advice}")
+            st.session_state['conversation_history'].append({'role': 'assistant', 'content': advice})
+            st.write(f"Assistant: {advice}")
             category_found = True
             break
-    
+
     if not category_found:
+        # Call the ask_openai method and append its response to the conversation history
         answer = assistant.ask_openai(user_question, st.session_state['conversation_history'])
         st.session_state['conversation_history'].append({'role': 'assistant', 'content': answer})
         st.write(f"Assistant: {answer}")
 
-    st.experimental_rerun()
+    # Clear the text input box after processing
+    st.session_state['user_input'] = ""
+
+# Display an update button (optional, may help with rerun flow)
+st.button("Update conversation", on_click=lambda: st.experimental_rerun())
