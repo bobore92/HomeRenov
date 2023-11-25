@@ -18,7 +18,7 @@ class RenovationAssistant:
             'Authorization': f'Bearer {self.openai_api_key}'
         }
         data = {
-            'model': 'gpt-4',  # Updated model to "gpt-4"
+            'model': 'gpt-4',  # Use OpenAI's GPT-4 model
             'messages': conversation_history + [{'role': 'user', 'content': question}]
         }
         response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
@@ -26,58 +26,52 @@ class RenovationAssistant:
             answer_content = response.json()['choices'][0]['message']['content']
             return answer_content
         else:
-            # Log the error response with the status code and returned message
-            error_message = response.json().get('error', {}).get('message', '')
-            return f"Error: {response.status_code}, {response.text}"
+            error_info = response.json().get('error', {})
+            return f"Error: {error_info.get('message', 'Unknown error occurred')}"
 
     def get_category_advice(self, category):
         return self.supplier_categories.get(category.lower(), "I'm not sure about that category. Can you specify which service you are looking for?")
 
-# Initialize session_state for first-time use
 if 'conversation_history' not in st.session_state:
     st.session_state['conversation_history'] = [{
         'role': 'system',
-        'content': (
-            "As a Home Renovation Project Assistant, I am your indispensable guide "
-            "throughout every phase of the renovation journey. From the initial concept "
-            "to the final finishing touches, I seamlessly integrate into your project, "
-            "ensuring a smooth and stress-free experience."
-        )
+        'content': "As a Home Renovation Project Assistant, I am your indispensable guide throughout every phase of the renovation journey."
     }]
 
 st.title("Home Renovation Assistant")
 
-# Instantiate the assistant class with the API key from the environment variable
 assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
 
-# Display the existing conversation history
-for message in st.session_state['conversation_history']:
+for message in st.session_state.conversation_history:
     st.write(f"{message['role'].title()}: {message['content']}")
 
-# User input
-user_input = st.text_input("How may I assist with your home renovation?", key="user_input")
+# A form to handle the question submission
+with st.form(key='user_input_form'):
+    user_input = st.text_input("How may I assist with your home renovation?", key="user_input")
+    submit_button = st.form_submit_button("Submit")
 
-# When the 'Submit' button is clicked, process the user's question
-if st.button("Submit"):
-    if user_input:
-        # Append the user's question to the conversation history
-        st.session_state['conversation_history'].append({'role': 'user', 'content': user_input})
-        category_advice = assistant.get_category_advice(user_input)
-        
-        # Check if user input matches a supplier category
-        if category_advice != "I'm not sure about that category. Can you specify which service you are looking for?":
-            answer = category_advice
-        else:
-            # If no category is matched, use the OpenAI model to respond
-            answer = assistant.ask_openai(user_input, st.session_state['conversation_history'])
+# Function that controls response addition
+def add_response(question, role='user'):
+    if not st.session_state.conversation_history or st.session_state.conversation_history[-1]['content'] != question:
+        st.session_state.conversation_history.append({
+            'role': role,
+            'content': question
+        })
 
-        # Append the assistant's answer to the conversation history only if it is unique
-        if not any(message['content'] == answer for message in st.session_state['conversation_history']):
-            st.session_state['conversation_history'].append({'role': 'assistant', 'content': answer})
+if submit_button:
+    # Process the input here
+    add_response(user_input)
 
-        # Clear the user input field
-        st.session_state['user_input'] = ''
+    category_found = False
+    for category, advice in assistant.supplier_categories.items():
+        if category in user_input.lower():
+            add_response(advice, 'assistant')
+            category_found = True
+            break
 
-        # Update the UI with new messages by rerunning the script
-        st.experimental_rerun()
+    if not category_found:
+        answer = assistant.ask_openai(user_input, st.session_state.conversation_history)
+        add_response(answer, 'assistant')
 
+    # Clear the user_input
+    st.session_state.user_input = ""
