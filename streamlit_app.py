@@ -12,7 +12,8 @@ if 'messages' not in st.session_state:
 # Now, because `st.session_state.messages` has been ensured to exist,
 # it's safe to append new messages to it.
 st.session_state.messages.append({'role': 'user', 'content': user_question})
-# ...import os
+# ...
+import os
 import requests
 import streamlit as st
 
