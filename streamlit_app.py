@@ -50,7 +50,7 @@ if 'conversation_history' not in st.session_state:
             "As a Home Renovation Project Assistant, I am your indispensable guide "
             "throughout every phase of the renovation journey. From the initial concept "
             "to the final finishing touches, I seamlessly integrate into your project, "
-            "ensuring a smooth and stress-free experience. How may I assist with your home renovation?"
+            "ensuring a smooth and stress-free experience."
         )
     }]
 
