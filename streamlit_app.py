@@ -64,7 +64,7 @@ for message in st.session_state.conversation_history:
     st.write(f"{message['role'].title()}: {message['content']}")
 
 # User input form to manage the state properly
-with st.form(key='user_input_form'):
+with st.sidebar(key='user_input_form'):
     user_input = st.text_input("")
     form_submit = st.form_submit_button("Submit")
 
