@@ -2,8 +2,15 @@ import os
 import requests
 import streamlit as st
 
+import streamlit as st
+
 image_url = 'https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg'
-st.image(image_url, width=300)  # Adjust the width as needed
+
+# Centered container for the image
+st.markdown(
+    f'<div style="text-align:center"><img src="{image_url}" width="300"/></div>',
+    unsafe_allow_html=True
+)
 
 
 
