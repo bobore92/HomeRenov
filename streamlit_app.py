@@ -63,9 +63,22 @@ assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
 for message in reversed(st.session_state.conversation_history[-2:]):
     st.write(f"{message['role'].title()}: {message['content']}")
 
+
+
 # User input form to manage the state properly
 with st.form(key='user_input_form'):
     user_input = st.text_input("")
+
+    SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
+
     
     # Use form_submit_button without specifying the label
     form_submit = st.form_submit_button()
