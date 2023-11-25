@@ -17,7 +17,7 @@ class RenovationAssistant:
         self.openai_api_key = openai_api_key
         self.supplier_categories = {
             'notary': 'Notary services provide witness and legal formalities for documentation.',
-            'tax accountant': 'Tax accountants can help you maximize your returns and manage your financial paperwork.',
+            'tax accountant': 'The role of a tax accountant encompasses providing assistance with regulatory compliance, which includes completing forms related to renovations and managing incentives such as the superbonus.',
             'architect': 'Architects design the structure and aesthetics of your home according to your vision.',
             'building company': 'Building companies execute the construction and renovation work on your home.'
         }
