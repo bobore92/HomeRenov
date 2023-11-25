@@ -2,6 +2,9 @@ import os
 import requests
 import streamlit as st
 
+image_path = 'house.jpg'
+st.image(image_path, use_column_width=True)
+
 class RenovationAssistant:
     def __init__(self, openai_api_key):
         self.openai_api_key = openai_api_key
