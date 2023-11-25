@@ -50,6 +50,10 @@ assistant = RenovationAssistant("YOUR_OPENAI_API_KEY")
 # Set sidebar style
 st.sidebar.markdown("<h1 style='color: #0b53a1;'>User Input</h1>", unsafe_allow_html=True)
 
+# Initialize conversation_history in session state
+if 'conversation_history' not in st.session_state:
+    st.session_state.conversation_history = []
+
 # Define the form within the sidebar
 with st.sidebar.form(key='user_input_form'):
     user_input = st.text_input("How may I assist with your home renovation?")
