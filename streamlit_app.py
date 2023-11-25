@@ -50,6 +50,9 @@ st.title("Home Renovation Assistant")
 for message in st.session_state.conversation_history:
     st.write(f"{message['role'].title()}: {message['content']}")
 
+# Create an empty slot for the user input form
+user_input_slot = st.empty()
+
 # User input form to manage the state properly
 with st.form(key='user_input_form'):
     # Existing conversation history will be displayed above the user input bar
