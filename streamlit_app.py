@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 
-# Define sidebar style
+# Set the sidebar style to be at the bottom
 SIDEBAR_STYLE = {
     "position": "fixed",
     "bottom": 0,
@@ -11,42 +11,7 @@ SIDEBAR_STYLE = {
     "background-color": "#f8f9fa",
 }
 
-class RenovationAssistant:
-    def __init__(self, openai_api_key):
-        self.openai_api_key = openai_api_key
-        self.supplier_categories = {
-            'notary': 'Notary services provide witness and legal formalities for documentation.',
-            'tax accountant': 'The role of a tax accountant encompasses providing assistance with regulatory compliance, which includes completing forms related to renovations and managing incentives such as the superbonus.',
-            'architect': 'Architects design the structure and aesthetics of your home according to your vision.',
-            'building company': 'Building companies execute the construction and renovation work on your home.'
-        }
-
-    def ask_openai(self, question, conversation_history):
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self.openai_api_key}'
-        }
-        data = {
-            'model': 'gpt-3.5-turbo-1106',
-            'messages': conversation_history + [{'role': 'user', 'content': question}]
-        }
-        response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
-        if response.status_code == 200:
-            answer_content = response.json()['choices'][0]['message']['content']
-            return answer_content
-        else:
-            error_info = response.json().get('error', {})
-            return f"Error: {error_info.get('message', 'Unknown error occurred')}"
-
-    def get_category_advice(self, category):
-        return self.supplier_categories.get(category.lower(), "I'm not sure about that category. Can you specify which service you are looking for?")
-
-# Streamlit app initialization
 st.title("AI - House Renovation")
-
-# Set sidebar style
-st.sidebar.markdown("<h1 style='color: #0b53a1;'>User Input</h1>", unsafe_allow_html=True)
-st.text_input("")
 
 # Instantiate the assistant class using the OpenAI API key from Streamlit secrets
 assistant = RenovationAssistant("YOUR_OPENAI_API_KEY")
@@ -56,10 +21,7 @@ if 'conversation_history' not in st.session_state:
     st.session_state.conversation_history = [{
         'role': 'system',
         'content': (
-            "As a Home Renovation Project Assistant, I am your indispensable guide "
-            "throughout every phase of the renovation journey. From the initial concept "
-            "to the final finishing touches, I seamlessly integrate into your project, "
-            "ensuring a smooth and stress-free experience."
+            "As a Home Renovation Project Assistant, I am your indispensable guide throughout every phase of the renovation journey. From the initial concept to the final finishing touches, I seamlessly integrate into your project, ensuring a smooth and stress-free experience."
         )
     }]
 
