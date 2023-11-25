@@ -1,4 +1,18 @@
-import os
+import streamlit as st
+
+# ... (rest of your code where you define RenovationAssistant etc.)
+
+# Use Streamlit's session state to initialize messages if it doesn't already exist
+if 'messages' not in st.session_state:
+    st.session_state['messages'] = []
+
+# Rest of your Streamlit app logic
+# ...
+
+# Now, because `st.session_state.messages` has been ensured to exist,
+# it's safe to append new messages to it.
+st.session_state.messages.append({'role': 'user', 'content': user_question})
+# ...import os
 import requests
 import streamlit as st
 
