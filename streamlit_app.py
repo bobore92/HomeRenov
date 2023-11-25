@@ -59,9 +59,9 @@ if 'conversation_history' not in st.session_state:
 
 st.title("AI - House Renovation")
 
-# Display the conversation history
-for message in st.session_state.conversation_history:
-    st.write(f"{message['role'].title()}: {message['content']}")
+# Display the assistant's answer
+if len(st.session_state.conversation_history) > 1:
+    st.write(f"Assistant: {st.session_state.conversation_history[-1]['content']}")
 
 # User input form
 with st.form(key='user_input_form'):
@@ -89,9 +89,9 @@ with st.form(key='user_input_form'):
                 st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
 
             # The form has been submitted, now display the assistant's response
-            for message in st.session_state.conversation_history[-2:]:  # Displaying the last 2 messages from the conversation history
-                st.write(f"{message['role'].title()}: {message['content']}")
+            st.write(f"Assistant: {st.session_state.conversation_history[-1]['content']}")
 
     # Check if the user input form has been submitted
     if form_submit:
         handle_form_submission()
+
