@@ -4,21 +4,12 @@ import requests
 # Define sidebar style
 SIDEBAR_STYLE = {
     "position": "fixed",
-    "top": 0,
-    "left": 0,
     "bottom": 0,
-    "width": "16rem",
+    "left": 0,
+    "width": "100%",
     "padding": "2rem 1rem",
     "background-color": "#f8f9fa",
 }
-
-# Centered container for the image
-st.markdown(
-    f'<div style="display: flex; justify-content: center; align-items: center; height: 300px;">'
-    f'<img src="https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg" style="width:300px; height:auto;"/>'
-    '</div>',
-    unsafe_allow_html=True
-)
 
 class RenovationAssistant:
     def __init__(self, openai_api_key):
@@ -54,10 +45,8 @@ class RenovationAssistant:
 st.title("AI - House Renovation")
 
 # Set sidebar style
-st.sidebar.markdown(
-    "<h1 style='color: #0b53a1;'>User Input</h1>", unsafe_allow_html=True
-)
-st.sidebar.text_input("")
+st.sidebar.markdown("<h1 style='color: #0b53a1;'>User Input</h1>", unsafe_allow_html=True)
+st.text_input("")
 
 # Instantiate the assistant class using the OpenAI API key from Streamlit secrets
 assistant = RenovationAssistant("YOUR_OPENAI_API_KEY")
@@ -101,4 +90,20 @@ def handle_form_submission():
 
         # The form has been submitted, now display the assistant's response
         for message in st.session_state.conversation_history[-2:]:  # Displaying the last 2 messages from the conversation history
-            st.write(f"{message['
+            st.write(f"{message['role']}: {message['content']}")
+
+# Set sidebar style after the form definition
+st.sidebar.markdown("<h1 style='color: #0b53a1;'>User Input</h1>", unsafe_allow_html=True)
+st.text_input("", key="sidebar_input")
+
+# Move the form submit button to the end
+st.write("\n\n")  # Add space between the sidebar and the form button
+form_submit  # Render the form submit button
+
+# Display the image below the form and sidebar
+st.markdown(
+    f'<div style="display: flex; justify-content: center; align-items: center; height: 300px;">'
+    f'<img src="https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg" style="width:300px; height:auto;"/>'
+    '</div>',
+    unsafe_allow_html=True
+)
