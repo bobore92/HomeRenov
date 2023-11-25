@@ -2,6 +2,16 @@ import os
 import requests
 import streamlit as st
 
+image_url = 'https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg'
+
+# Centered container for the image
+st.markdown(
+    f'<div style="display: flex; justify-content: center; align-items: center; height: 300px;">'
+    f'<img src="{image_url}" style="width:300px; height:auto;"/>'
+    '</div>',
+    unsafe_allow_html=True
+)
+
 class RenovationAssistant:
     def __init__(self, openai_api_key):
         self.openai_api_key = openai_api_key
@@ -18,7 +28,7 @@ class RenovationAssistant:
             'Authorization': f'Bearer {self.openai_api_key}'
         }
         data = {
-            'model': 'gpt-3.5-turbo-1106',
+            'model': 'gpt-3.5-turbo-1106',  # Model updated to 'gpt-4'
             'messages': conversation_history + [{'role': 'user', 'content': question}]
         }
         response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
@@ -45,6 +55,9 @@ if 'conversation_history' not in st.session_state:
     }]
 
 st.title("Home Renovation Assistant")
+
+# Instantiate the assistant class using the OpenAI API key from Streamlit secrets
+assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
 
 # Display the conversation history
 for message in st.session_state.conversation_history:
@@ -75,10 +88,10 @@ def handle_form_submission():
             answer = assistant.ask_openai(user_question, st.session_state.conversation_history)
             st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
 
+        # The form has been submitted, now display the assistant's response
+        for message in st.session_state.conversation_history[-2:]:  # Displaying the last 2 messages from the conversation history
+            st.write(f"{message['role'].title()}: {message['content']}")
+
 # Check if the user input form has been submitted
 if form_submit:
     handle_form_submission()
-
-# Display the conversation history again, including the latest user input and assistant's response
-for message in st.session_state.conversation_history[-2:]:
-    st.write(f"{message['role'].title()}: {message['content']}")
