@@ -50,6 +50,11 @@ st.title("Home Renovation Assistant")
 for message in st.session_state.conversation_history:
     st.write(f"{message['role'].title()}: {message['content']}")
 
+# User input form to manage the state properly
+with st.form(key='user_input_form'):
+    user_input = st.text_input("How may I assist with your home renovation?")
+    form_submit = st.form_submit_button("Submit")
+
 # Callback function to handle form submission
 def handle_form_submission():
     user_question = user_input  # Retrieve the input from the form
@@ -70,19 +75,10 @@ def handle_form_submission():
             answer = assistant.ask_openai(user_question, st.session_state.conversation_history)
             st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
 
-        # The form has been submitted, now display the assistant's response
-        for message in st.session_state.conversation_history[-2:]:  # Displaying the last 2 messages from the conversation history
-            st.write(f"{message['role'].title()}: {message['content']}")
-
-# Create an empty slot for the user input form
-user_input_slot = st.empty()
-
-# User input form to manage the state properly
-with st.form(key='user_input_form'):
-    # Existing conversation history will be displayed above the user input bar
-    user_input = st.text_input("How may I assist with your home renovation?")
-    form_submit = st.form_submit_button("Submit")
-
 # Check if the user input form has been submitted
 if form_submit:
     handle_form_submission()
+
+# Display the conversation history again, including the latest user input and assistant's response
+for message in st.session_state.conversation_history[-2:]:
+    st.write(f"{message['role'].title()}: {message['content']}")
