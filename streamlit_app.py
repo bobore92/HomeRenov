@@ -2,8 +2,9 @@ import os
 import requests
 import streamlit as st
 
-image_url = 'https://github.com/bobore92/HomeRenov/blob/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg'
+image_url = 'https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg'
 st.image(image_url, use_column_width=True)
+
 
 class RenovationAssistant:
     def __init__(self, openai_api_key):
