@@ -2,7 +2,7 @@ import os
 import requests
 import streamlit as st
 
-image_path = 'house.jpg'
+image_path = 'house-renovation.jpg'
 st.image(image_path, use_column_width=True)
 
 class RenovationAssistant:
