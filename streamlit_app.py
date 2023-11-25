@@ -3,7 +3,7 @@ import requests
 import streamlit as st
 
 image_url = 'https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg'
-st.image(image_url, use_column_width=True, width=300)  # Adjust the width as needed
+st.image(image_url, use_column_width=True, width=200)  # Adjust the width as needed
 
 
 
