@@ -33,53 +33,53 @@ class RenovationAssistant:
     def get_category_advice(self, category):
         return self.supplier_categories.get(category.lower(), "I'm not sure about that category. Can you specify which service you are looking for?")
 
+# Initialize the conversation history in session state if not already present
 if 'conversation_history' not in st.session_state:
     st.session_state['conversation_history'] = [{
         'role': 'system',
         'content': (
             "As a Home Renovation Project Assistant, I am your indispensable guide "
-            "throughout every phase of the renovation journey."
+            "throughout every phase of the renovation journey. From the initial concept "
+            "to the final finishing touches, I seamlessly integrate into your project, "
+            "ensuring a smooth and stress-free experience."
         )
     }]
 
+# Title of the app
 st.title("Home Renovation Assistant")
 
-# Instantiate the assistant class
-openai_api_key = st.secrets["OPENAI_KEY"]
-assistant = RenovationAssistant(openai_api_key)
+# Instantiate the RenovationAssistant class with the API key from Streamlit's secret store
+assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
 
-# Display the conversation history
+# Display the existing conversation history
 for message in st.session_state['conversation_history']:
     st.write(f"{message['role'].title()}: {message['content']}")
 
-# Define a callback to handle the form submission
-def handle_form_submit():
-    user_question = st.session_state['user_input']  # Access the input from session_state
-    if user_question:
-        st.session_state['conversation_history'].append({'role': 'user', 'content': user_question})
+# User input form
+with st.form(key='user_input_form'):
+    user_question = st.text_input("How may I assist with your home renovation?")
+    submit_button = st.form_submit_button(label='Submit')
 
-        category_found = False
-        # Check if the user's question falls into any of the supplier categories
-        for category_key, category_value in assistant.supplier_categories.items():
-            if category_key in user_question.lower():
-                # Append the category advice to the conversation history
-                st.session_state['conversation_history'].append({'role': 'assistant', 'content': category_value})
-                # Display the category advice immediately on the app
-                st.write(f"Assistant: {category_value}")
-                category_found = True
-                break
-        
-        # If the user's question does not match a supplier category,
-        # ask OpenAI for a response
-        if not category_found:
-            # Ask OpenAI and append the response to the conversation history
-            answer = assistant.ask_openai(user_question, st.session_state['conversation_history'])
-            st.session_state['conversation_history'].append({'role': 'assistant', 'content': answer})
-            st.write(f"Assistant: {answer}")
+# Process the user's question on form submission
+if submit_button and user_question:
+    st.session_state['conversation_history'].append({'role': 'user', 'content': user_question})
 
-# User input handled with text_input and on_change callback
-with st.form("user_input_form"):
-    user_input = st.text_input("How may I assist with your home renovation?", key="user_input")
-    submit_button = st.form_submit_button("Submit", on_click=handle_form_submit)
+    category_found = False
+    for category in assistant.supplier_categories:
+        if category in user_question.lower():
+            category_advice = assistant.get_category_advice(category)
+            st.session_state['conversation_history'].append({'role': 'assistant', 'content': category_advice})
+            category_found = True
+            break
 
+    if not category_found:
+        answer = assistant.ask_openai(user_question, st.session_state['conversation_history'])
+        st.session_state['conversation_history'].append({'role': 'assistant', 'content': answer})
+
+    # Clear the user question input and rerun the app to update the UI
+    st.session_state['user_input'] = ''
+    st.experimental_rerun()
+
+# Add a button to manually update the conversation history if needed
+st.button("Update conversation", on_click=lambda: st.experimental_rerun())
 
