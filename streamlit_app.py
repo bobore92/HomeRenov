@@ -56,9 +56,6 @@ if 'conversation_history' not in st.session_state:
 
 st.title("AI - House Renovation")
 
-# Instantiate the assistant class using the OpenAI API key from Streamlit secrets
-assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
-
 # Display the conversation history
 for message in st.session_state.conversation_history:
     st.write(f"{message['role'].title()}: {message['content']}")
