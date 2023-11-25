@@ -3,38 +3,11 @@ import requests
 import streamlit as st
 
 class RenovationAssistant:
-    def __init__(self, openai_api_key):
-        self.openai_api_key = openai_api_key
-        self.supplier_categories = {
-            'notary': 'Notary services provide witness and legal formalities for documentation.',
-            'tax accountant': 'Tax accountants can help you maximize your returns and manage your financial paperwork.',
-            'architect': 'Architects design the structure and aesthetics of your home according to your vision.',
-            'building company': 'Building companies execute the construction and renovation work on your home.'
-        }
-
-    def ask_openai(self, question, conversation_history):
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self.openai_api_key}'
-        }
-        data = {
-            'model': 'gpt-4-1106-preview',
-            'messages': conversation_history + [{'role': 'user', 'content': question}]
-        }
-        response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
-        if response.status_code == 200:
-            answer_content = response.json()['choices'][0]['message']['content']
-            conversation_history.append({'role': 'user', 'content': question})
-            conversation_history.append({'role': 'assistant', 'content': answer_content})
-            return answer_content
-        else:
-            return f"Error: {response.status_code}, {response.text}"
-
-    def get_category_advice(self, category):
-        return self.supplier_categories.get(category.lower(), "I'm not sure about that category. Can you specify which service you are looking for?")
+    # ... [existing class definition] ...
 
 if 'conversation_history' not in st.session_state:
     st.session_state['conversation_history'] = [{
+        'id': 'welcome',
         'role': 'system',
         'content': (
             "As a Home Renovation Project Assistant, I am your indispensable guide "
@@ -42,37 +15,61 @@ if 'conversation_history' not in st.session_state:
         )
     }]
 
-if 'last_question' not in st.session_state:
-    st.session_state['last_question'] = ""
+# Function that generates a unique identifier for a message
+def generate_message_id():
+    return str(hash(f"{st.session_state['conversation_history'][-1]['id']}:{len(st.session_state['conversation_history'])}"))
 
 st.title("Home Renovation Assistant")
+
+# Instantiate the assistant class
 assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
 
-for message in st.session_state.conversation_history:
+# Display the existing conversation history
+for message in st.session_state['conversation_history']:
     st.write(f"{message['role'].title()}: {message['content']}")
 
-with st.form(key='user_interaction_form'):
-    user_question = st.text_input("How may I assist with your home renovation?", key="user_question")
-    submit_button = st.form_submit_button(label="Submit")
+# User input
+user_input = st.text_input("How may I assist with your home renovation?", key="user_input")
 
-if submit_button:
-    if user_question and user_question != st.session_state.last_question:
-        st.session_state.last_question = user_question
-        st.session_state.conversation_history.append({'role': 'user', 'content': user_question})
-
+# On 'Submit' button click
+if st.button("Submit"):
+    # Append the user question to the conversation history only if it is not the last one
+    if user_input and (not st.session_state['conversation_history'] or 
+                       st.session_state['conversation_history'][-1].get('content') != user_input):
+        # Add the user question with a unique ID
+        st.session_state['conversation_history'].append({
+            'id': generate_message_id(),
+            'role': 'user',
+            'content': user_input
+        })
+        
         category_found = False
-        for category in assistant.supplier_categories:
-            if category in user_question.lower():
-                category_advice = assistant.get_category_advice(category)
-                st.session_state.conversation_history.append({'role': 'assistant', 'content': category_advice})
+        for category, advice in assistant.supplier_categories.items():
+            if category in user_input.lower():
+                st.session_state['conversation_history'].append({
+                    'id': generate_message_id(),
+                    'role': 'assistant',
+                    'content': advice
+                })
                 category_found = True
-                break  # Break the loop since we found the category
+                break
 
+        # If no category found ask OpenAI API
         if not category_found:
-            # No category found, let's ask OpenAI
-            answer = assistant.ask_openai(user_question, st.session_state.conversation_history)
-            st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
+            answer = assistant.ask_openai(user_input, st.session_state['conversation_history'])
+            st.session_state['conversation_history'].append({
+                'id': generate_message_id(),
+                'role': 'assistant',
+                'content': answer
+            })
 
-        # Since we've processed this new question, let's rerun the app to clean up for the next input
+        # Clear the input
+        st.session_state['user_input'] = ''
+        # Rerun to refresh the state and the display
         st.experimental_rerun()
+
+# Always show the last message
+if st.session_state['conversation_history']:
+    last_msg = st.session_state['conversation_history'][-1]
+    st.write(f"{last_msg['role'].title()}: {last_msg['content']}")
 
