@@ -1,13 +1,21 @@
-import os
-import requests
 import streamlit as st
+import requests
 
-image_url = 'https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg'
+# Define sidebar style
+SIDEBAR_STYLE = {
+    "position": "fixed",
+    "top": 0,
+    "left": 0,
+    "bottom": 0,
+    "width": "16rem",
+    "padding": "2rem 1rem",
+    "background-color": "#f8f9fa",
+}
 
 # Centered container for the image
 st.markdown(
     f'<div style="display: flex; justify-content: center; align-items: center; height: 300px;">'
-    f'<img src="{image_url}" style="width:300px; height:auto;"/>'
+    f'<img src="https://raw.githubusercontent.com/bobore92/HomeRenov/27074fefb9ce62bb5a04595e22fa0357eefdb902/house-renovation.jpg" style="width:300px; height:auto;"/>'
     '</div>',
     unsafe_allow_html=True
 )
@@ -43,6 +51,18 @@ class RenovationAssistant:
         return self.supplier_categories.get(category.lower(), "I'm not sure about that category. Can you specify which service you are looking for?")
 
 # Streamlit app initialization
+st.title("AI - House Renovation")
+
+# Set sidebar style
+st.sidebar.markdown(
+    "<h1 style='color: #0b53a1;'>User Input</h1>", unsafe_allow_html=True
+)
+st.sidebar.text_input("")
+
+# Instantiate the assistant class using the OpenAI API key from Streamlit secrets
+assistant = RenovationAssistant("YOUR_OPENAI_API_KEY")
+
+# Display the conversation history
 if 'conversation_history' not in st.session_state:
     st.session_state.conversation_history = [{
         'role': 'system',
@@ -54,58 +74,31 @@ if 'conversation_history' not in st.session_state:
         )
     }]
 
-st.title("AI - House Renovation")
-
-# Instantiate the assistant class using the OpenAI API key from Streamlit secrets
-assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
-
-# Display the conversation history
-for message in reversed(st.session_state.conversation_history[-2:]):
-    st.write(f"{message['role'].title()}: {message['content']}")
-
-
-
 # User input form to manage the state properly
 with st.form(key='user_input_form'):
-    user_input = st.text_input("")
+    user_input = st.text_input("How may I assist with your home renovation?")
+    form_submit = st.form_submit_button("Submit")
 
-    SIDEBAR_STYLE = {
-    "position": "fixed",
-    "top": 0,
-    "left": 0,
-    "bottom": 0,
-    "width": "16rem",
-    "padding": "2rem 1rem",
-    "background-color": "#f8f9fa",
-}
+# Callback function to handle form submission
+def handle_form_submission():
+    user_question = user_input  # Retrieve the input from the form
+    if user_question:
+        # Append the user's question
+        st.session_state.conversation_history.append({'role': 'user', 'content': user_question})
 
-    
-    # Use form_submit_button without specifying the label
-    form_submit = st.form_submit_button()
+        # Process the user's question against the assistant's supplier categories
+        category_found = False
+        for category, advice in assistant.supplier_categories.items():
+            if category in user_question.lower():
+                st.session_state.conversation_history.append({'role': 'assistant', 'content': advice})
+                category_found = True
+                break
 
-    # Callback function to handle form submission
-    def handle_form_submission():
-        user_question = user_input  # Retrieve the input from the form
-        if user_question:
-            # Process the user's question against the assistant's supplier categories
-            category_found = False
-            for category, advice in assistant.supplier_categories.items():
-                if category in user_question.lower():
-                    st.session_state.conversation_history.append({'role': 'user', 'content': user_question})
-                    st.session_state.conversation_history.append({'role': 'assistant', 'content': advice})
-                    category_found = True
-                    break
+        # If the user's question does not match any category, ask the assistant (GPT-4 model)
+        if not category_found:
+            answer = assistant.ask_openai(user_question, st.session_state.conversation_history)
+            st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
 
-            # If the user's question does not match any category, ask the assistant (GPT-4 model)
-            if not category_found:
-                answer = assistant.ask_openai(user_question, st.session_state.conversation_history)
-                st.session_state.conversation_history.append({'role': 'user', 'content': user_question})
-                st.session_state.conversation_history.append({'role': 'assistant', 'content': answer})
-
-            # Display the assistant's and user's messages in reverse order (assistant's message on top)
-            for message in reversed(st.session_state.conversation_history[-2:]):
-                st.write(f"{message['role'].title()}: {message['content']}")
-
-    # Check if the user input form has been submitted
-    if form_submit:
-        handle_form_submission()
+        # The form has been submitted, now display the assistant's response
+        for message in st.session_state.conversation_history[-2:]:  # Displaying the last 2 messages from the conversation history
+            st.write(f"{message['
