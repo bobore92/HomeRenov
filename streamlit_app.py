@@ -18,34 +18,26 @@ openai_api_key = st.secrets["OPENAI_KEY"]
 assistant = RenovationAssistant(openai_api_key)
 
 # Display the conversation history
-for message in st.session_state.conversation_history:
+for message in st.session_state['conversation_history']:
     st.write(f"{message['role'].title()}: {message['content']}")
 
-# User input
-if 'user_input' not in st.session_state:
-    st.session_state['user_input'] = ''
+# User input with a callback to update session state
+def on_user_input():
+    input_value = st.session_state['user_input']
+    if input_value:
+        st.session_state['conversation_history'].append({'role': 'user', 'content': input_value})
 
-user_question = st.text_input("How may I assist with your home renovation?", value=st.session_state.user_input, key="user_input")
+        # ... (rest of the processing)
 
-submit_button = st.button("Submit")
+        # Clear the input after processing
+        st.session_state['user_input'] = ''  # Reset the input box
+        # No need to rerun the whole script, just continue after user_input is processed
 
-if submit_button and user_question:
-    st.session_state['conversation_history'].append({'role': 'user', 'content': user_question})
-    st.session_state['user_input'] = ''  # Clear the input
-    st.session_state.save()  # Save the session state changes
+# Widget for the user's question
+user_question = st.text_input(
+    "How may I assist with your home renovation?",
+    key="user_input",
+    on_change=on_user_input
+)
 
-    category_found = False
-    for category in assistant.supplier_categories:
-        if category in user_question.lower():
-            category_advice = assistant.get_category_advice(category)
-            st.session_state['conversation_history'].append({'role': 'assistant', 'content': category_advice})
-            category_found = True
-            break
-
-    if not category_found:
-        answer = assistant.ask_openai(user_question, st.session_state['conversation_history'])
-        st.session_state['conversation_history'].append({'role': 'assistant', 'content': answer})
-
-    st.experimental_rerun()
-
-st.button("Update conversation", on_click=lambda: st.experimental_rerun())
+st.button("Submit", on_click=on_user_input)
