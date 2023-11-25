@@ -44,33 +44,42 @@ if 'conversation_history' not in st.session_state:
 
 st.title("Home Renovation Assistant")
 
+# Instantiate the assistant class
 openai_api_key = st.secrets["OPENAI_KEY"]
 assistant = RenovationAssistant(openai_api_key)
 
+# Display the conversation history
 for message in st.session_state['conversation_history']:
     st.write(f"{message['role'].title()}: {message['content']}")
 
-user_question = st.text_input("How may I assist with your home renovation?", key="user_input")
-submit_button = st.button("Submit")
+# Define a callback to handle the form submission
+def handle_form_submit():
+    user_question = st.session_state['user_input']  # Access the input from session_state
+    if user_question:
+        st.session_state['conversation_history'].append({'role': 'user', 'content': user_question})
 
-if submit_button and user_question:
-    st.session_state['conversation_history'].append({'role': 'user', 'content': user_question})
+        category_found = False
+        # Check if the user's question falls into any of the supplier categories
+        for category_key, category_value in assistant.supplier_categories.items():
+            if category_key in user_question.lower():
+                # Append the category advice to the conversation history
+                st.session_state['conversation_history'].append({'role': 'assistant', 'content': category_value})
+                # Display the category advice immediately on the app
+                st.write(f"Assistant: {category_value}")
+                category_found = True
+                break
+        
+        # If the user's question does not match a supplier category,
+        # ask OpenAI for a response
+        if not category_found:
+            # Ask OpenAI and append the response to the conversation history
+            answer = assistant.ask_openai(user_question, st.session_state['conversation_history'])
+            st.session_state['conversation_history'].append({'role': 'assistant', 'content': answer})
+            st.write(f"Assistant: {answer}")
 
-    category_found = False
-    for category in assistant.supplier_categories:
-        if category in user_question.lower():
-            category_advice = assistant.get_category_advice(category)
-            st.session_state['conversation_history'].append({'role': 'assistant', 'content': category_advice})
-            category_found = True
-            break
-    
-    if not category_found:
-        answer = assistant.ask_openai(user_question, st.session_state['conversation_history'])
-        st.session_state['conversation_history'].append({'role': 'assistant', 'content': answer})
+# User input handled with text_input and on_change callback
+with st.form("user_input_form"):
+    user_input = st.text_input("How may I assist with your home renovation?", key="user_input")
+    submit_button = st.form_submit_button("Submit", on_click=handle_form_submit)
 
-    # Clear the text box after submission
-    st.session_state.user_input = ''
-    st.experimental_rerun()
-
-st.button("Update conversation", on_click=st.experimental_rerun)
 
