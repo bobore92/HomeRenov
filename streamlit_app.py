@@ -54,7 +54,7 @@ if 'conversation_history' not in st.session_state:
         )
     }]
 
-st.title("Home Renovation Assistant")
+st.title("AI - House Renovation")
 
 # Instantiate the assistant class using the OpenAI API key from Streamlit secrets
 assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
