@@ -66,7 +66,9 @@ for message in reversed(st.session_state.conversation_history[-2:]):
 # User input form to manage the state properly
 with st.form(key='user_input_form'):
     user_input = st.text_input("")
-    form_submit = st.form_submit_button("Submit", key="submit_button")
+    
+    # Use form_submit_button without specifying the label
+    form_submit = st.form_submit_button()
 
     # Callback function to handle form submission
     def handle_form_submission():
