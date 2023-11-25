@@ -42,6 +42,9 @@ class RenovationAssistant:
     def get_category_advice(self, category):
         return self.supplier_categories.get(category.lower(), "I'm not sure about that category. Can you specify which service you are looking for?")
 
+# Instantiate the assistant class using the OpenAI API key from Streamlit secrets
+assistant = RenovationAssistant(st.secrets["OPENAI_KEY"])
+
 # Streamlit app initialization
 if 'conversation_history' not in st.session_state:
     st.session_state.conversation_history = [{
