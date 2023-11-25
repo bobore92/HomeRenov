@@ -18,7 +18,7 @@ class RenovationAssistant:
             'Authorization': f'Bearer {self.openai_api_key}'
         }
         data = {
-            'model': 'text-davinci-001',  # Model updated to 'gpt-4'
+            'model': 'tts-1-hd',  # Model updated to 'gpt-4'
             'messages': conversation_history + [{'role': 'user', 'content': question}]
         }
         response = requests.post('https://api.openai.com/v1/chat/completions', headers=headers, json=data)
