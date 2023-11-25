@@ -50,7 +50,7 @@ if 'conversation_history' not in st.session_state:
             "As a Home Renovation Project Assistant, I am your indispensable guide "
             "throughout every phase of the renovation journey. From the initial concept "
             "to the final finishing touches, I seamlessly integrate into your project, "
-            "ensuring a smooth and stress-free experience."
+            "ensuring a smooth and stress-free experience. How may I assist with your home renovation?"
         )
     }]
 
@@ -65,7 +65,7 @@ for message in st.session_state.conversation_history:
 
 # User input form to manage the state properly
 with st.form(key='user_input_form'):
-    user_input = st.text_input("How may I assist with your home renovation?")
+    user_input = st.text_input("")
     form_submit = st.form_submit_button("Submit")
 
 # Callback function to handle form submission
