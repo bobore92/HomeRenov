@@ -53,6 +53,9 @@ with st.sidebar.form(key='user_input_form'):
     user_input = st.text_input("How may I assist with your home renovation?")
     form_submit = st.form_submit_button("Submit")
 
+    # Instantiate the assistant class using the OpenAI API key from Streamlit secrets
+    assistant = RenovationAssistant("YOUR_OPENAI_API_KEY")
+
     # Callback function to handle form submission
     if form_submit:
         user_question = user_input  # Retrieve the input from the form
